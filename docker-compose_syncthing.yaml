@@ -1,0 +1,27 @@
+version: "3.9"
+
+services:
+  syncthing:
+    container_name: syncthing
+    image: linuxserver/syncthing:1.29.2
+    restart: unless-stopped
+    hostname: syncthing
+    network_mode: bridge
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Europe/Warsaw
+    ports:
+      - "8384:8384/tcp"     # Syncthing Web UI
+      - "22000:22000/tcp"   # Sync TCP
+      - "22000:22000/udp"   # Sync UDP
+      - "21027:21027/udp"   # Local Discovery
+    volumes:
+      - /your_path/docker/syncthing/config:/config
+      - /your_path/docker/syncthing/DATA:/DATA
+    deploy:
+      resources:
+        limits:
+          memory: 15866M
+        reservations:
+          memory: "268435456"

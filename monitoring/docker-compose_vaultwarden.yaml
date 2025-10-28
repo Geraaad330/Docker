@@ -1,0 +1,24 @@
+version: "3.9"
+services:
+  vaultwarden:
+    image: vaultwarden/server:testing
+    container_name: vaultwarden
+    restart: unless-stopped
+    environment:
+      DOMAIN: "https://vaultwarden.domanin.com" # Adres URL (domena) Twojej instancji Vaultwarden 
+      SSO_ENABLED: "true" # Czy logowanie przez SSO ma być aktywne
+      SSO_ONLY: "true"  # wyłącza logowanie Master Password / email
+      SSO_SIGNUPS_MATCH_EMAIL: "true"  # łączy istniejące konta po emailu
+      SSO_ALLOW_UNKNOWN_EMAIL_VERIFICATION: "false" # Kontrola, czy użytkownik z nieznanym e-mailem może się zalogować po weryfikacji przez SSO
+      SSO_AUTHORITY: "https://authentik.company/application/o/vaultwarden/" # Adres URL (endpoint) usługi SSO/OIDC
+      SSO_CLIENT_ID: # Identyfikator aplikacji klienckiej zarejestrowanej w usłudze SSO/OIDC 
+      SSO_CLIENT_SECRET: # Tajny klucz uwierzytelniający Vaultwarden względem serwera SSO/OIDC
+      SSO_SCOPES: "openid email profile offline_access" # Zakresy uprawnień według protokołu OIDC 
+      SSO_OIDC_REDIRECT_URL: "https://vaultwarden.domanin.com/sso/oidc-signin" # określa dokładny adres URL, pod który Twój serwer Vaultwarden ma przekierować użytkownika po zakończeniu uwierzytelniania przez zewnętrznego dostawcę SSO
+      SSO_ROLES_ENABLED: "false" # Pozwala na mapowanie ról z SSO na konta Vaultwarden
+      SSO_PKCE: "true" # Włącza mechanizm PKCE (Proof Key for Code Exchange)
+      SSO_DEBUG_TOKENS: "false" # Jeżeli true, włącza wypisywanie tokenów OIDC/SSO w logach Vaultwarden do debugowania
+    volumes:
+      - /your_path/docker/vaultwarden:/data
+    ports:
+      - 10380:80

@@ -1,0 +1,22 @@
+version: "3.9"
+
+services:
+  nginx-proxy-manager:
+    container_name: nginx-proxy-manager
+    image: jc21/nginx-proxy-manager:latest
+    restart: unless-stopped
+    hostname: nginx-proxy-manager
+    network_mode: bridge
+    ports:
+      - "80:80/tcp"        # HTTP
+      - "443:443/tcp"      # HTTPS
+      - "81:81/tcp"        # Web UI
+    volumes:
+      - /your_path/docker/npm/data:/data
+      - /your_path/docker/npm/letsencrypt:/etc/letsencrypt
+    deploy:
+      resources:
+        limits:
+          memory: 15866M
+        reservations:
+          memory: "67108864"

@@ -1,0 +1,116 @@
+version: "3.8"
+
+services:
+  grafana:
+    user: "1001"
+    image: grafana/grafana
+    container_name: grafana
+    restart: always
+    ports:
+      - 3333:3000
+    environment:
+      - GF_PANELS_DISABLE_SANITIZE_HTML=true
+      - GF_SECURITY_ADMIN_USER=user
+      - GF_SECURITY_ADMIN_PASSWORD=password
+      - GF_USERS_ALLOW_SIGN_UP=false
+      - TZ=Europe/Warsaw
+    networks:
+      - monitoring
+    volumes:
+      - "/your_path/docker/grafana/grafana-volume:/var/lib/grafana"
+
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: prometheus
+    restart: always
+    user: "1001"
+    ports:
+      - 9090:9090
+    environment:
+      - TZ=Europe/Warsaw
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--log.level=error'
+      - '--storage.tsdb.path=/prometheus'
+      - '--storage.tsdb.retention.time=7d'
+    volumes:
+      - type: bind
+        source: "/your_path/docker/prometheus"
+        target: /prometheus
+      - type: bind
+        source: "/your_path/docker/prometheus/prometheus.yml"
+        target: /etc/prometheus/prometheus.yml
+    networks:
+      - monitoring
+
+  cadvisor:
+    image: gcr.io/cadvisor/cadvisor:v0.47.0
+    container_name: cadvisor
+    restart: always
+    privileged: true
+    command: -logtostderr -docker_only
+    environment:
+      - TZ=Europe/Warsaw
+    volumes:
+      - type: bind
+        source: /
+        target: /rootfs
+        read_only: true
+      - type: bind
+        source: /var/run
+        target: /var/run
+        read_only: true
+      - type: bind
+        source: /sys
+        target: /sys
+        read_only: true
+      - type: bind
+        source: /var/lib/docker
+        target: /var/lib/docker
+        read_only: true
+      - type: bind
+        source: /dev/disk
+        target: /dev/disk
+        read_only: true
+    devices:
+      - /dev/kmsg:/dev/kmsg
+    networks:
+      - monitoring
+    ports:
+      - 8081:8080
+
+  node-exporter:
+      image: prom/node-exporter:v1.5.0
+      container_name: nodeexporter
+      restart: always
+      command:
+        - '--path.sysfs=/host/sys'
+        - '--path.procfs=/host/proc'
+        - '--path.udev.data=/rootfs/run/udev/data'
+        - '--collector.filesystem.ignored-mount-points=^/(sys|proc|dev|host|etc)($$|/)'
+        - '--no-collector.ipvs'
+      environment:
+        - TZ=Europe/Warsaw
+      volumes:
+        - type: bind
+          source: /
+          target: /rootfs
+          read_only: true
+        - type: bind
+          source: /proc
+          target: /host/proc
+          read_only: true
+        - type: bind
+          source: /sys
+          target: /host/sys
+          read_only: true
+        - type: bind
+          source: /run/udev/data
+          target: /rootfs/run/udev/data
+          read_only: true
+      networks:
+        - monitoring
+
+networks:
+  monitoring:
+    driver: bridge

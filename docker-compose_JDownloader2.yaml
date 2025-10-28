@@ -1,0 +1,34 @@
+version: "3.9"
+
+services:
+  jdownloader2:
+    container_name: jdownloader2
+    image: jlesage/jdownloader-2:latest
+    restart: unless-stopped
+    hostname: jdownloader2
+    network_mode: bridge
+    environment:
+      - USER_ID=1000
+      - GROUP_ID=1000
+      - TZ=Europe/Warsaw
+      - JDOWNLOADER_HEADLESS=  # Pozostaw pusty, jeśli chcesz korzystać z domyślnego trybu graficznego z web-GUI (port 5800)
+      - MYJDOWNLOADER_DEVICE_NAME=your_device
+      - MYJDOWNLOADER_EMAIL=email@example.com
+      - MYJDOWNLOADER_PASSWORD=your_password
+    ports:
+      - "5800:5800/tcp"      # Web GUI
+      - "5900:5900/tcp"      # VNC
+      - "3129:3129/tcp"      # JD API
+    volumes:
+      - /your_path/docker/jdownloader2/config:/config
+      - /your_path/docker/jdownloader2/downloads:/output
+    deploy:
+      resources:
+        limits:
+          memory: 15866M
+        reservations:
+          memory: "67108864"
+
+networks:
+  default:
+    name: jdownloader2_default

@@ -1,0 +1,14 @@
+services:
+  ofelia:
+      image: mcuadros/ofelia:latest
+      container_name: ofelia 
+      command: daemon # Ignoruj etykiety, czytaj jeden główny plik konfiguracyjny
+      restart: always
+      environment:                
+      - TZ=Europe/Warsaw        
+      volumes:
+	# Mapowanie gniazda systemowego Dockera do wnętrza Ofelli
+        - /var/run/docker.sock:/var/run/docker.sock:ro 
+        - /docker:/host_docker
+	# Mapowanie lokalizacji pliku ini tam gdzie spodziewa się go ofelia
+        - /docker/ofelia/config.ini:/etc/ofelia.conf

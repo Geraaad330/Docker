@@ -1,0 +1,27 @@
+services:
+  node-red:
+    image: nodered/node-red:latest
+    container_name: node-red
+    environment:
+      - TZ=Europe/Warsaw
+      - GOOGLE_API_KEY=
+    ports:
+      - "1880:1880" # Web UI
+    networks:
+      - node-red-net
+    # Uruchomienie jako root (0:0) jest konieczne, aby node-red
+    # mogl zarzadzac Dockerem i czytac logi systemowe bez bledow "Permission Denied".
+    user: "0:0"
+    volumes:
+      # Lokalizacja plikow konfiguracyjnych node-red, dostepne pod /data w kontenerze
+      - /docker/node-red/data:/data
+      
+      # Mapowanie gniazda systemowego Dockera, dostep do sterowania Dockerem
+      - /var/run/docker.sock:/var/run/docker.sock
+      
+      # Dostep do logow systemowych (do czytania i backupu)
+      # Mapujemy logi hosta do folderu /host_logs wewnatrz kontenera
+      - /var/log:/host_logs:ro
+
+networks:
+  node-red-net:

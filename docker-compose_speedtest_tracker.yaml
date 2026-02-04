@@ -1,0 +1,43 @@
+services:
+  speedtest-tracker:
+    image: lscr.io/linuxserver/speedtest-tracker:latest
+    container_name: speedtest-tracker
+    environment:
+      - PUID=1000 # ID uzytkownika, do ktorego nalezy kontener
+      - PGID=1000 # ID grupy, do ktorego nalezy kontener
+      - TZ=Etc/UTC
+      # Glowny klucz szyfrujacy aplikacji w formacie base64
+      - APP_KEY=base64:xxxxxxxxx
+      # Domena pod ktora dostepny jest kontener
+      - APP_URL=https://kontener.speedtest-tracker.com
+      # Baza danych sqlite
+      - DB_CONNECTION=sqlite
+      # Harmonogram wykonania testow: testy o 0:00, 4:00, 8:00, 14:00, 21:00 kazdego dnia, kazdego miesiaca
+      - SPEEDTEST_SCHEDULE=0 4,8,14,21 * * *
+      # Puste - domyslne serwery
+      - SPEEDTEST_SERVERS=
+      - DISPLAY_TIMEZONE=Europe/Warsaw
+      - PRUNE_RESULTS_OLDER_THAN=0
+     # Loklizacja plikow konfiguracyjnych kontenera
+    volumes:
+      - /docker/speedtest-tracker/data:/config
+    ports:
+      - 8099:80 # Web UI kontenera : port pod ktorym dziala kontener
+    # Publiczne adresy DNS dodane ze wzgledu na DNS MeshVPN serwera
+    dns:
+      - 8.8.8.8
+      - 1.1.1.1
+    restart: unless-stopped
+    # Nie uruchamiaj Speedtesta poki kontener Apprise nie wstanie
+    depends_on:
+      - apprise-api
+
+  # Kontener do obslugi powiadomien
+  apprise-api:
+    image: lscr.io/linuxserver/apprise-api:latest
+    container_name: apprise-api
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Europe/Warsaw
+    restart: unless-stopped

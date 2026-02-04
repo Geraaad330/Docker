@@ -1,0 +1,48 @@
+services:
+  diun:
+    image: crazymax/diun:latest
+    container_name: diun
+    command: serve
+    volumes:
+      # Mapowanie gniazda systemowego Dockera
+      - "/var/run/docker.sock:/var/run/docker.sock"
+      # Katalog na pliki konfiguracyjne, dostepne pod /data w kontenerze
+      - "/docker/diun/data:/data"
+    environment:
+      - "TZ=Europe/Warsaw"
+      - "LOG_LEVEL=info"
+      - "LOG_JSON=false"
+      - "DIUN_WATCH_WORKERS=10" 
+      - "DIUN_WATCH_SCHEDULE=0 12 * * *" 
+      # Nie wysylaj powiadomien przy pierwszym skanowaniu bazy (domyslnie false) (jesli tak wysle tyle powiadomien ile kontenerow)
+      - "DIUN_WATCH_FIRSTCHECKNOTIF=true" 
+      # skanuj wszystko od razu po starcie kontenera (domyslnie true)
+      - "DIUN_WATCH_RUNONSTARTUP=true" 
+      # Obejrzyj wszystkie tagi tego obrazu kontener
+      - "DIUN_DEFAULTS_WATCHREPO=false"
+      # Lista statusow, o ktorych należy powiadomic. (default new,update)
+      - "DIUN_DEFAULTS_NOTIFYON=new,update" 
+      # Automatyczne wykrywanie kontenerow
+      - "DIUN_PROVIDERS_DOCKER=true"
+      # aby program automatycznie monitorowal wszystkie kontenery
+      - "DIUN_PROVIDERS_DOCKER_WATCHBYDEFAULT=true"
+      # Autoryzacja Docker Hub
+      - "DIUN_REGOPTS_0_NAME=docker.io"
+      - "DIUN_REGOPTS_0_SELECTOR=image"
+      - "DIUN_REGOPTS_0_USERNAME=" # Twoj username
+      - "DIUN_REGOPTS_0_PASSWORD=" # Twoj token
+      # Powiadomienia Gotify
+      # IP i port twojego Gotify
+      - "DIUN_NOTIF_GOTIFY_ENDPOINT=http://192.168.x.x:port"
+      - "DIUN_NOTIF_GOTIFY_TOKEN="
+      - "DIUN_NOTIF_GOTIFY_PRIORITY=5"
+      - "DIUN_NOTIF_GOTIFY_TEMPLATETITLE=DIUN: 🚀 Nowa aktualizacja"
+      - "DIUN_NOTIF_GOTIFY_TEMPLATEBODY=Dostępna jest nowa wersja dla: **{{ .Entry.Image }}**"
+      # Powiadomienia Discord
+      # Webhook twojego Discorda
+      - "DIUN_NOTIF_DISCORD_WEBHOOKURL=https://discordapp.com/api/webhooks/"
+      - "DIUN_NOTIF_DISCORD_MENTIONS=@everyone"
+      - "DIUN_NOTIF_DISCORD_TIMEOUT=10s"
+      - "DIUN_NOTIF_DISCORD_TEMPLATEBODY=DIUN 🚀 Dostępna jest nowa wersja dla: **{{ .Entry.Image }}**"
+      - "DIUN_NOTIF_DISCORD_RENDERFIELDS=true"
+    restart: always

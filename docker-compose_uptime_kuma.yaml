@@ -1,0 +1,15 @@
+services:
+  uptime-kuma:
+    image: louislam/uptime-kuma:2
+    container_name: uptime-kuma
+    # Domena pod ktora dostepny jest kontener : IP serwera, na ktorym jest kontener
+    extra_hosts:
+      - "xx.example.com:192.168.x.x"
+    restart: unless-stopped
+    volumes:
+    # Lokalizacja plikow konfiguracyjnych Dockera. /app/data dostepny wewnatrz kontenera
+      - /docker/uptime-kuma/data:/app/data
+    # Mapowanie gniazda systemowego Dockera
+      - /var/run/docker.sock:/var/run/docker.sock
+    ports:
+      - "3001:3001" # Web UI kontenera

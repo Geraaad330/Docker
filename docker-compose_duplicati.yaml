@@ -1,0 +1,23 @@
+
+  duplicati:
+    image: lscr.io/linuxserver/duplicati:latest
+    container_name: duplicati
+    restart: unless-stopped
+    environment:
+      - PUID=0  # ID roota
+      - PGID=0  # Grupa roota
+      - TZ=Europe/Warsaw
+      - SETTINGS_ENCRYPTION_KEY=
+      - DUPLICATI__WEBSERVICE_PASSWORD=
+    volumes:
+      # Lokalizacja plikow konfiguracyjnych
+      - /docker/duplicati:/config
+      
+      # Lokalizacja do skopiowiania, widoczne w duplicati pod /source
+      # Read-Only dla bezpieczenstwa
+      - /docker:/source:ro
+      
+      # Lokalizacja gotowego buckupu
+      - /serwer/backups:/backups
+    ports:
+      - 8200:8200 # Web UI

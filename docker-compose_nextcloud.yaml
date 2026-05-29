@@ -1,6 +1,7 @@
 version: "3.9"
 
 services:
+  # Database backend for Nextcloud (MariaDB) - stores metadata, users, and app configurations
   db:
     container_name: nextcloud-db
     image: mariadb:11
@@ -22,6 +23,7 @@ services:
         reservations:
           memory: "67108864"
 
+  # Main Nextcloud application container (Web UI, API, and core logic)
   nextcloud:
     container_name: nextcloud
     image: linuxserver/nextcloud:latest
@@ -51,6 +53,7 @@ services:
         reservations:
           memory: "67108864"
 
+  # Redis in-memory cache to improve Nextcloud performance (file locking, memory caching)
   redis:
     container_name: nextcloud-redis
     image: redis:7-alpine

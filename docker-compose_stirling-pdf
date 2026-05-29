@@ -1,0 +1,11 @@
+services:
+  stirling-pdf:
+    image: stirlingtools/stirling-pdf:latest-fat
+    ports:
+      - '1010:8080'
+    volumes:
+      - /docker/stirling-pdf/trainingData:/usr/share/tessdata # Data for OCR (optional)
+      - /docker/stirling-pdf/extraConfigs:/configs
+      - /docker/stirling-pdf/customFiles:/customFiles
+    environment:
+      - DOCKER_ENABLE_SECURITY=false # Set to true if you want to enable login

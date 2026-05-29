@@ -1,0 +1,74 @@
+services:
+  # Main application container for Wallabag (a self-hostable read-it-later application like Pocket).
+  # It handles the web interface, fetching articles, and managing user data.
+  wallabag:
+    image: wallabag/wallabag
+    restart: unless-stopped
+    environment:
+      # Root password for the database connection
+      - MYSQL_ROOT_PASSWORD=password
+      # Defines the database driver to use (MySQL/MariaDB)
+      - SYMFONY__ENV__DATABASE_DRIVER=pdo_mysql
+      # The hostname of the database container (matches the service name 'db' below)
+      - SYMFONY__ENV__DATABASE_HOST=db
+      # The port on which the database is accessible
+      - SYMFONY__ENV__DATABASE_PORT=3306
+      # The name of the database created for Wallabag
+      - SYMFONY__ENV__DATABASE_NAME=nickname      
+      # The username for the database connection
+      - SYMFONY__ENV__DATABASE_USER=nickname 
+      # The password for the database connection
+      - SYMFONY__ENV__DATABASE_PASSWORD=password
+      # The character set for the database (Note: 'password' is likely a typo here, usually it's 'utf8mb4')
+      - SYMFONY__ENV__DATABASE_CHARSET=password
+      # Prefix added to all Wallabag tables in the database
+      - SYMFONY__ENV__DATABASE_TABLE_PREFIX="wallabag_"
+      # SMTP/Mailer connection string ('null://null' means email sending is disabled)
+      - SYMFONY__ENV__MAILER_DSN=null://null
+      # The email address used as the sender for outgoing notifications
+      - SYMFONY__ENV__FROM_EMAIL=mail@example.com
+      # The public URL where your Wallabag instance is accessible
+      - SYMFONY__ENV__DOMAIN_NAME=https://wallabag.domain.com
+      # The protocol used for the server (e.g., https or http)
+      - SYMFONY__ENV__SERVER_SCHEME=https
+      # The title/name displayed on your Wallabag web interface
+      - SYMFONY__ENV__SERVER_NAME="Your wallabag instance"
+    ports:
+      # Maps the internal container port (80) to the host port (9999) for Web UI access
+      - 9999:80
+    volumes:
+      # Persists downloaded images from articles so they aren't lost on container restart
+      - /docker/wallabag/images:/var/www/wallabag/web/assets/images
+    depends_on:
+      # Ensures Wallabag waits for the database and cache to start first
+      - db
+      - redis
+
+  # Database container (MariaDB) to store Wallabag's persistent data (users, articles, settings).
+  db:
+    image: mariadb
+    restart: unless-stopped
+    environment:
+      # Sets the superuser (root) password for the MariaDB instance
+      - MYSQL_ROOT_PASSWORD=password
+    volumes:
+      # Persists the actual database files on the host system
+      - /docker/wallabag/mariadb/data:/var/lib/mysql
+      # Mounts a backup directory to allow exporting/saving database dumps via scripts (like Ofelia)
+      - /docker/backups/dumps:/backups/dumps
+    healthcheck:
+      # Checks if the database is fully initialized and ready to accept connections
+      test: ["CMD", "/usr/local/bin/healthcheck.sh", "--innodb_initialized"]
+      interval: 20s
+      timeout: 3s
+      
+  # In-memory data structure store (Redis) used by Wallabag as a cache.
+  # It significantly speeds up the application by caching web pages, sessions, and background tasks.
+  redis:
+    image: redis:alpine
+    restart: unless-stopped    
+    healthcheck:
+      # Verifies that the Redis server is alive and responding to pings
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 20s
+      timeout: 3s

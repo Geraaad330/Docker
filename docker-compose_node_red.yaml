@@ -9,18 +9,18 @@ services:
       - "1880:1880" # Web UI
     networks:
       - node-red-net
-    # Uruchomienie jako root (0:0) jest konieczne, aby node-red
-    # mogl zarzadzac Dockerem i czytac logi systemowe bez bledow "Permission Denied".
+    # Running as root (0:0) is required so that node-red
+    # can manage Docker and read system logs without "Permission Denied" errors.
     user: "0:0"
     volumes:
-      # Lokalizacja plikow konfiguracyjnych node-red, dostepne pod /data w kontenerze
+      # Node-RED configuration files location, available under /data in the container
       - /docker/node-red/data:/data
       
-      # Mapowanie gniazda systemowego Dockera, dostep do sterowania Dockerem
+      # Mapping the Docker system socket, access to control Docker
       - /var/run/docker.sock:/var/run/docker.sock
       
-      # Dostep do logow systemowych (do czytania i backupu)
-      # Mapujemy logi hosta do folderu /host_logs wewnatrz kontenera
+      # Access to system logs (for reading and backups)
+      # Mapping host logs to the /host_logs folder inside the container
       - /var/log:/host_logs:ro
 
 networks:

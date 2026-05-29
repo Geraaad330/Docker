@@ -12,9 +12,9 @@ services:
       - PGID=1000
       - TZ=Europe/Warsaw
     ports:
-      - "3001:3000/tcp"   # UI AdGuard Home
+      - "3001:3000/tcp"   # AdGuard Home UI
       - "853:853/tcp"     # DNS-over-TLS
-      - "784:784/udp"     # DNS dla klientów
+      - "784:784/udp"     # DNS for clients
     volumes:
       - /your_path/docker/adguardhome/work:/opt/adguardhome/work
       - /your_path/docker/adguardhome/conf:/opt/adguardhome/conf

@@ -1,0 +1,42 @@
+services:
+  # Speedtest Tracker runs automated internet speed tests and provides a web dashboard to track connection history.
+  speedtest-tracker:
+    image: lscr.io/linuxserver/speedtest-tracker:latest
+    container_name: speedtest-tracker
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Etc/UTC
+      # Base64 encoded encryption key used by the underlying Laravel framework to secure sessions and encrypted data
+      - APP_KEY=...
+      # The base URL of the application, required for correct routing and generating links in notifications
+      - APP_URL=https://speedtest-tracek.domain.com
+      - DB_CONNECTION=sqlite
+      - SPEEDTEST_SCHEDULE=0 4,8,14,21 * * *
+      - SPEEDTEST_SERVERS=
+      - DISPLAY_TIMEZONE=Europe/Warsaw # Optional
+      - PRUNE_RESULTS_OLDER_THAN=0 # Optional
+    volumes:
+      - /docker/speedtest-tracker/data:/config
+    # Maps the internal container port (80) to the host port (8099) so you can access the Web UI
+    ports:
+      - 8099:80
+    # Forces the container to use specific public DNS servers (Google, Cloudflare) to prevent local DNS or VPN interference during speed tests
+    dns:
+      - 8.8.8.8
+      - 1.1.1.1
+    restart: unless-stopped
+    # Ensures that the apprise-api container starts before this one (optional, but good practice)
+    depends_on:         
+      - apprise-api
+
+  # Apprise API provides a unified endpoint for sending notifications to various platforms (Discord, Telegram, Gotify, etc.).
+  # Speedtest Tracker uses it to send alerts (e.g., if a speed test fails or if speeds drop below a certain threshold).
+  apprise-api:
+    image: lscr.io/linuxserver/apprise-api:latest
+    container_name: apprise-api
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Europe/Warsaw
+    restart: unless-stopped

@@ -1,0 +1,18 @@
+version: "3"
+services:
+  navidrome:
+    image: deluan/navidrome:latest
+    container_name: navidrome
+    user: 1000:1000 # Optional: match with your user ID (command: id)
+    ports:
+      - "4533:4533" # Port on which the panel will be accessible (e.g., http://your-ip:4533)
+    restart: unless-stopped
+    environment:
+      # Configuration options
+      ND_SCANSCHEDULE: 1h
+      ND_LOGLEVEL: info  
+      ND_SESSIONTIMEOUT: 24h
+      ND_BASEURL: ""
+    volumes:
+      - /docker/navidrome/data:/data # Here Navidrome stores its settings and database (created automatically)
+      - /docker/navidrome/music/:/music:ro # IMPORTANT: Change the left side to the path of your MP3/FLAC files

@@ -6,21 +6,21 @@ services:
     ports:
       - "9980:9980" # Web UI 
     environment:
-      # Pozwala na polaczenie sie z instancja Collabora
+      # Allows connection to the Collabora instance
       - domain=all 
       - username=
       - password=
-      # Wyłączenie SSL wewnątrz kontenera (wymagane przy Nginx Proxy Manager)
+      # Disable SSL inside the container (required with Nginx Proxy Manager)
       - extra_params=--o:ssl.enable=false --o:ssl.termination=true
     cap_add:
-      # Pozwala kontenerowi tworzyc specjalne pliki urzadzen
+      # Allows the container to create special device files
       - MKNOD 
-      # Niezbedne do operacji montowania i zarzadzania systemem plikow wewnatrz kontenera
+      # Necessary for mounting operations and file system management inside the container
       - SYS_ADMIN 
-    # Przydzielenie kontenerowi wirtualnego terminala
+    # Allocate a pseudo-TTY to the container
     tty: true 
     extra_hosts:
-      # Mapowanie domen po ktorymi jest dostepny kontener na adres serwera
-      # bo serwer jest za NAT-em, te wpisy kaza szukac domen lokalnie
+      # Map the domains under which the container is accessible to the server address
+      # because the server is behind a NAT, these entries force local domain resolution
       - "nextcloud.example:192.168.x.x"
       - "collabora.example:192.168.x.x"

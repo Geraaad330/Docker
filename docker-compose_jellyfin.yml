@@ -11,8 +11,8 @@ services:
       - /path/to/yours/movies:/data/movies
       - /path/to/yours/series:/data/series
     ports:
-      - 8096:8096
-      - 8920:8920 #optional
-      - 7359:7359/udp #optional
-      - 1900:1900/udp #optional
+      - 8096:8096      # HTTP Web UI and HTTP streaming
+      - 8920:8920      # HTTPS Web UI and HTTPS streaming (optional)
+      - 7359:7359/udp  # Auto-discovery for local clients (optional)
+      - 1900:1900/udp  # DLNA/UPnP service discovery (optional)
     restart: unless-stopped

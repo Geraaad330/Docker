@@ -11,7 +11,7 @@ services:
       - USER_ID=1000
       - GROUP_ID=1000
       - TZ=Europe/Warsaw
-      - JDOWNLOADER_HEADLESS=  # Pozostaw pusty, jeśli chcesz korzystać z domyślnego trybu graficznego z web-GUI (port 5800)
+      - JDOWNLOADER_HEADLESS=  # Leave empty if you want to use the default graphical mode with web GUI (port 5800)
       - MYJDOWNLOADER_DEVICE_NAME=your_device
       - MYJDOWNLOADER_EMAIL=email@example.com
       - MYJDOWNLOADER_PASSWORD=your_password

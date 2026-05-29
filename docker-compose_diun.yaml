@@ -4,9 +4,9 @@ services:
     container_name: diun
     command: serve
     volumes:
-      # Mapowanie gniazda systemowego Dockera
+      # Map the Docker system socket
       - "/var/run/docker.sock:/var/run/docker.sock"
-      # Katalog na pliki konfiguracyjne, dostepne pod /data w kontenerze
+      # Directory for configuration files, available under /data in the container
       - "/docker/diun/data:/data"
     environment:
       - "TZ=Europe/Warsaw"
@@ -14,35 +14,35 @@ services:
       - "LOG_JSON=false"
       - "DIUN_WATCH_WORKERS=10" 
       - "DIUN_WATCH_SCHEDULE=0 12 * * *" 
-      # Nie wysylaj powiadomien przy pierwszym skanowaniu bazy (domyslnie false) (jesli tak wysle tyle powiadomien ile kontenerow)
+      # Do not send notifications on the first database scan (default false) (if true, it will send as many notifications as there are containers)
       - "DIUN_WATCH_FIRSTCHECKNOTIF=true" 
-      # skanuj wszystko od razu po starcie kontenera (domyslnie true)
+      # Scan everything immediately after container startup (default true)
       - "DIUN_WATCH_RUNONSTARTUP=true" 
-      # Obejrzyj wszystkie tagi tego obrazu kontener
+      # Watch all tags for this container image
       - "DIUN_DEFAULTS_WATCHREPO=false"
-      # Lista statusow, o ktorych należy powiadomic. (default new,update)
+      # List of statuses to notify about (default new,update)
       - "DIUN_DEFAULTS_NOTIFYON=new,update" 
-      # Automatyczne wykrywanie kontenerow
+      # Automatic container detection
       - "DIUN_PROVIDERS_DOCKER=true"
-      # aby program automatycznie monitorowal wszystkie kontenery
+      # Allow the program to automatically monitor all containers
       - "DIUN_PROVIDERS_DOCKER_WATCHBYDEFAULT=true"
-      # Autoryzacja Docker Hub
+      # Docker Hub authorization
       - "DIUN_REGOPTS_0_NAME=docker.io"
       - "DIUN_REGOPTS_0_SELECTOR=image"
-      - "DIUN_REGOPTS_0_USERNAME=" # Twoj username
-      - "DIUN_REGOPTS_0_PASSWORD=" # Twoj token
-      # Powiadomienia Gotify
-      # IP i port twojego Gotify
+      - "DIUN_REGOPTS_0_USERNAME=" # Your username
+      - "DIUN_REGOPTS_0_PASSWORD=" # Your token
+      # Gotify notifications
+      # IP and port of your Gotify server
       - "DIUN_NOTIF_GOTIFY_ENDPOINT=http://192.168.x.x:port"
       - "DIUN_NOTIF_GOTIFY_TOKEN="
       - "DIUN_NOTIF_GOTIFY_PRIORITY=5"
-      - "DIUN_NOTIF_GOTIFY_TEMPLATETITLE=DIUN: 🚀 Nowa aktualizacja"
-      - "DIUN_NOTIF_GOTIFY_TEMPLATEBODY=Dostępna jest nowa wersja dla: **{{ .Entry.Image }}**"
-      # Powiadomienia Discord
-      # Webhook twojego Discorda
+      - "DIUN_NOTIF_GOTIFY_TEMPLATETITLE=DIUN: 🚀 New update"
+      - "DIUN_NOTIF_GOTIFY_TEMPLATEBODY=A new version is available for: **{{ .Entry.Image }}**"
+      # Discord notifications
+      # Your Discord webhook URL
       - "DIUN_NOTIF_DISCORD_WEBHOOKURL=https://discordapp.com/api/webhooks/"
       - "DIUN_NOTIF_DISCORD_MENTIONS=@everyone"
       - "DIUN_NOTIF_DISCORD_TIMEOUT=10s"
-      - "DIUN_NOTIF_DISCORD_TEMPLATEBODY=DIUN 🚀 Dostępna jest nowa wersja dla: **{{ .Entry.Image }}**"
+      - "DIUN_NOTIF_DISCORD_TEMPLATEBODY=DIUN 🚀 A new version is available for: **{{ .Entry.Image }}**"
       - "DIUN_NOTIF_DISCORD_RENDERFIELDS=true"
     restart: always

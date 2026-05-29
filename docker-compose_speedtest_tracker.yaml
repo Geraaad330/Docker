@@ -3,36 +3,36 @@ services:
     image: lscr.io/linuxserver/speedtest-tracker:latest
     container_name: speedtest-tracker
     environment:
-      - PUID=1000 # ID uzytkownika, do ktorego nalezy kontener
-      - PGID=1000 # ID grupy, do ktorego nalezy kontener
+      - PUID=1000 # User ID the container belongs to
+      - PGID=1000 # Group ID the container belongs to
       - TZ=Etc/UTC
-      # Glowny klucz szyfrujacy aplikacji w formacie base64
+      # Main application encryption key in base64 format
       - APP_KEY=base64:xxxxxxxxx
-      # Domena pod ktora dostepny jest kontener
+      # Domain under which the container is accessible
       - APP_URL=https://kontener.speedtest-tracker.com
-      # Baza danych sqlite
+      # SQLite database connection
       - DB_CONNECTION=sqlite
-      # Harmonogram wykonania testow: testy o 0:00, 4:00, 8:00, 14:00, 21:00 kazdego dnia, kazdego miesiaca
+      # Test schedule: tests at 0:00, 4:00, 8:00, 14:00, 21:00 every day
       - SPEEDTEST_SCHEDULE=0 4,8,14,21 * * *
-      # Puste - domyslne serwery
+      # Empty - default servers
       - SPEEDTEST_SERVERS=
       - DISPLAY_TIMEZONE=Europe/Warsaw
       - PRUNE_RESULTS_OLDER_THAN=0
-     # Loklizacja plikow konfiguracyjnych kontenera
+     # Container configuration files location
     volumes:
       - /docker/speedtest-tracker/data:/config
     ports:
-      - 8099:80 # Web UI kontenera : port pod ktorym dziala kontener
-    # Publiczne adresy DNS dodane ze wzgledu na DNS MeshVPN serwera
+      - 8099:80 # Container Web UI : port on which the container runs
+    # Public DNS addresses added due to the server's MeshVPN DNS
     dns:
       - 8.8.8.8
       - 1.1.1.1
     restart: unless-stopped
-    # Nie uruchamiaj Speedtesta poki kontener Apprise nie wstanie
+    # Do not start Speedtest until the Apprise container is up
     depends_on:
       - apprise-api
 
-  # Kontener do obslugi powiadomien
+  # Container for handling notifications
   apprise-api:
     image: lscr.io/linuxserver/apprise-api:latest
     container_name: apprise-api

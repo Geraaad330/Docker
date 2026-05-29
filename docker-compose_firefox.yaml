@@ -13,8 +13,8 @@ services:
       - TZ=Etc/UTC
       - FIREFOX_CLI=https://www.linuxserver.io/
     ports:
-      - "3005:3000/tcp"   # Główny interfejs Firefox
-      - "3006:3001/tcp"   # Dodatkowy port
+      - "3005:3000/tcp"   # Main Firefox UI
+      - "3006:3001/tcp"   # Additional port
     volumes:
       - /your_path/docker/firefox/config:/config
     security_opt:
